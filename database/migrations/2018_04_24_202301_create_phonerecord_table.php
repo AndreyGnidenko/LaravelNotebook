@@ -17,7 +17,7 @@ class CreatePhonerecordTable extends Migration
             $table->increments('id');
             $table->timestamps();
 			$table->string('phonenum');
-			$table->string('FIO');
+			$table->string('fio');
         });
     }
 

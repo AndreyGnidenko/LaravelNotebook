@@ -11,11 +11,11 @@
 |
 */
 
-Route::get('/', 'PhonebookController@index');
+Route::get('/', 'PhonebookController@index')->name('index');;
 
-Route::post('/add', 'PhonebookController@addRecord');
+Route::post('/add', 'PhonebookController@addRecord')->name('addRecord');
 
-Route::post('/modify', 'PhonebookController@modifyRecord');
+Route::post('/modify', 'PhonebookController@modifyRecord')->name('modifyRecord');
 
-Route::post('/delete', 'PhonebookController@deleteRecord');
+Route::post('/delete', 'PhonebookController@deleteRecord')->name('deleteRecord');
 

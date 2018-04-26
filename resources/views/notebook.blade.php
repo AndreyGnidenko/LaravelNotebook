@@ -16,7 +16,7 @@
         <br/>
 		
 		@if (@isset($modifyRecId))
-			<form method="post" action="/modify" accept-charset="UTF-8">
+			<form method="post" action="{{ route('modifyRecord') }}" accept-charset="UTF-8">
 				<fieldset>
 					<legend>Редактирование записи {{ $fio }}</legend>
 								
@@ -34,7 +34,7 @@
 				{{csrf_field()}}
 			</form>
 		@else
-			<form method="post" action="/add" accept-charset="UTF-8">
+			<form method="post" action="{{ route('addRecord') }}" accept-charset="UTF-8">
 				<label>ФИО:
 				<input type="text" name="fio" placeholder="ФИО"></input>
 				</label>
@@ -58,12 +58,12 @@
 				
 				@foreach ($phoneRecs as $phoneRec)	
 					<tr>
-						<td> {{ $phoneRec->FIO }} </td>
+						<td> {{ $phoneRec->fio }} </td>
 						<td> {{ $phoneRec->phonenum }} </td>
 						<td>
-							<a href="?modifyRecId={{ $phoneRec->id }}&fio={{ $phoneRec->FIO }}&phonenum={{ $phoneRec->phonenum }}" style="color: green">Изменить</a> 
-						
-                            <form method="post" class="frm-link" action="/delete">
+							<a href="{{ route('index', ['modifyRecId'=> $phoneRec->id]) }}" style="color: green">Изменить</a>
+
+                            <form method="post" class="frm-link" action="{{ route('deleteRecord') }}">
                                 <button type="submit" name="delete" class="btn-link">Удалить</button>
                                 <input type="hidden" name="recId" value="{{ $phoneRec->id }}"/>
 

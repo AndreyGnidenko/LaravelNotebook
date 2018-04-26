@@ -8,5 +8,7 @@ class PhoneRecord extends Model
 {
     //
 	protected $table = 'phonerecords';
+
+    protected $fillable = ['fio', 'phonenum'];
 }
 

@@ -9,46 +9,41 @@ class PhonebookController extends Controller
 {
     public function index(Request $request)
 	{
-	    $modifyRecId = $request->input('modifyRecId', null);
-        $fio = $request->input('fio', null);
-        $phonenum = $request->input('phonenum', null);
-
 		$phoneRecs = PhoneRecord::all();
-		return view('notebook', compact('phoneRecs', 'modifyRecId', 'fio', 'phonenum'));
+        $viewData = compact('phoneRecs');
+
+		if ($request->has('modifyRecId'))
+        {
+            $recordId = $request->modifyRecId;
+            $phoneRecord = PhoneRecord::find($recordId);
+
+            if (isset($phoneRecord))
+            {
+                $viewData['modifyRecId'] = $recordId;
+                $viewData['fio'] = $phoneRecord->fio;
+                $viewData['phonenum'] = $phoneRecord->phonenum;
+            }
+        }
+
+        return view('notebook', $viewData);
 	}
 
 	public function addRecord(Request $request)
     {
-        $fio = $request->input('fio', '');
-        $phoneNumber = $request->input('phonenum', '');
-
-        if (!empty($fio) && !empty($phoneNumber))
-        {
-            $phoneRecord = new PhoneRecord;
-            $phoneRecord->fio = $fio;
-            $phoneRecord->phonenum  = $phoneNumber;
-            $phoneRecord->save();
-        }
-
-        return  redirect('/');
+        PhoneRecord::create($request->all());
+        return  redirect()->route('index');
     }
 
     public function modifyRecord(Request $request)
     {
-        $recId = $request->input('recId');
-        $fio = $request->input('fio', '');
-        $phoneNumber = $request->input('phonenum', '');
-
-        if (!empty($fio) && !empty($phoneNumber))
+        if ($request->has('recId') &&  $request->has('fio') && $request->has('phonenum') )
         {
-            $phoneRecord = PhoneRecord::find($recId);
-
-            $phoneRecord->fio = $fio;
-            $phoneRecord->phonenum  = $phoneNumber;
+            $phoneRecord = PhoneRecord::find($request->recId);
+            $phoneRecord->fill( $request->only(['fio', 'phonenum']));
             $phoneRecord->save();
         }
 
-        return  redirect('/');
+        return  redirect()->route('index');
     }
 
     public function deleteRecord(Request $request)
@@ -57,6 +52,6 @@ class PhonebookController extends Controller
 
         PhoneRecord::destroy($recId);
 
-        return  redirect('/');
+        return  redirect()->route('index');
     }
 }
