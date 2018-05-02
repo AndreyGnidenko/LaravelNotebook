@@ -2,56 +2,118 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Validator;
+use App\Http\Requests\PhoneRecordAddRequest;
+use App\Http\Requests\PhoneRecordModifyRequest;
 use App\PhoneRecord as PhoneRecord;
+use Illuminate\Http\Request;
 
-class PhonebookController extends Controller
+class PhoneBookController extends Controller
 {
-    public function index(Request $request)
-	{
-		$phoneRecs = PhoneRecord::all();
-        $viewData = compact('phoneRecs');
-
-		if ($request->has('modifyRecId'))
-        {
-            $recordId = $request->modifyRecId;
-            $phoneRecord = PhoneRecord::find($recordId);
-
-            if (isset($phoneRecord))
-            {
-                $viewData['modifyRecId'] = $recordId;
-                $viewData['fio'] = $phoneRecord->fio;
-                $viewData['phonenum'] = $phoneRecord->phonenum;
-            }
-        }
-
-        return view('notebook', $viewData);
-	}
-
-	public function addRecord(Request $request)
+    private function createValidator ($request)
     {
-        PhoneRecord::create($request->all());
-        return  redirect()->route('index');
+        $rules = [
+            'fio' => 'required',
+            'phonenum' =>
+                ['required', 'regex:/\+7\s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}/' ]
+            ];
+
+        $messages = [
+            'fio.required' => 'Необходимо ввести ФИО',
+            'phonenum.required'  => 'Нужно указать номер телефона',
+            'phonenum.regex'  => 'Номер телефона должен быть оформлен по образцу +7 (900) 123-45-67'
+        ];
+
+        return Validator::make($request->all(), $rules, $messages);
     }
 
-    public function modifyRecord(Request $request)
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
     {
-        if ($request->has('recId') &&  $request->has('fio') && $request->has('phonenum') )
+        return view('phoneRecord.index')->with(['phoneRecs' => PhoneRecord::all()]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('phoneRecord.create')->with(['phoneRecs' => PhoneRecord::all()]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        if ($request->has('create'))
         {
-            $phoneRecord = PhoneRecord::find($request->recId);
-            $phoneRecord->fill( $request->only(['fio', 'phonenum']));
+            $validator = $this->createValidator($request);
+
+            if ($validator->fails())
+            {
+                return view('phoneRecord.create')->with(['phoneRecs' => PhoneRecord::all()])->withErrors($validator);
+            }
+
+            PhoneRecord::create($request->all());
+        }
+        return redirect()->route('phoneRecords.index');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\PhoneRecord  $phoneRecord
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(PhoneRecord $phoneRecord)
+    {
+        return view('phoneRecord.modify')->with(['phoneRecs' => PhoneRecord::all(), 'phoneRecord'=> $phoneRecord]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\PhoneRecord  $phoneRecord
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, PhoneRecord $phoneRecord)
+    {
+        if ($request->has('update'))
+        {
+            $validator = $this->createValidator($request);
+
+            if ($validator->fails())
+            {
+                return view('phoneRecord.modify')->with(['phoneRecs' => PhoneRecord::all(), 'phoneRecord'=> $phoneRecord])->withErrors($validator);
+            }
+
+            $phoneRecord->update($request->all());
             $phoneRecord->save();
         }
-
-        return  redirect()->route('index');
+        return redirect()->route('phoneRecords.index');
     }
 
-    public function deleteRecord(Request $request)
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\PhoneRecord  $phoneRecord
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(PhoneRecord $phoneRecord)
     {
-        $recId = $request->input('recId');
-
-        PhoneRecord::destroy($recId);
-
-        return  redirect()->route('index');
+        $phoneRecord->delete();
+        return redirect()->route('phoneRecords.index');
     }
 }

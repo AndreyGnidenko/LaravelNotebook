@@ -11,11 +11,5 @@
 |
 */
 
-Route::get('/', 'PhonebookController@index')->name('index');;
-
-Route::post('/add', 'PhonebookController@addRecord')->name('addRecord');
-
-Route::post('/modify', 'PhonebookController@modifyRecord')->name('modifyRecord');
-
-Route::post('/delete', 'PhonebookController@deleteRecord')->name('deleteRecord');
-
+Route::resource('phoneRecords', 'PhoneBookController');
+Route::redirect('', 'phoneRecords');
