@@ -46,7 +46,7 @@ class PhoneBookController extends Controller
      */
     public function create()
     {
-        return view('phoneRecord.create')->with(['phoneRecs' => PhoneRecord::all()]);
+        return view('phoneRecord.create');
     }
 
     /**
