@@ -34,7 +34,8 @@ class PhoneBookController extends Controller
      */
     public function index()
     {
-        return view('phoneRecord.index')->with(['phoneRecs' => PhoneRecord::all()]);
+        $phoneRecords = PhoneRecord::all();
+        return view('phoneRecord.index')->with(['phoneRecs' => $phoneRecords]);
     }
 
     /**
@@ -62,7 +63,7 @@ class PhoneBookController extends Controller
 
             if ($validator->fails())
             {
-                return view('phoneRecord.create')->with(['phoneRecs' => PhoneRecord::all()])->withErrors($validator);
+                return view('phoneRecord.create')->withErrors($validator);
             }
 
             PhoneRecord::create($request->all());
@@ -78,7 +79,7 @@ class PhoneBookController extends Controller
      */
     public function edit(PhoneRecord $phoneRecord)
     {
-        return view('phoneRecord.modify')->with(['phoneRecs' => PhoneRecord::all(), 'phoneRecord'=> $phoneRecord]);
+        return view('phoneRecord.modify')->with(['phoneRecord'=> $phoneRecord]);
     }
 
     /**
@@ -96,11 +97,10 @@ class PhoneBookController extends Controller
 
             if ($validator->fails())
             {
-                return view('phoneRecord.modify')->with(['phoneRecs' => PhoneRecord::all(), 'phoneRecord'=> $phoneRecord])->withErrors($validator);
+                return view('phoneRecord.modify')->with(['phoneRecord'=> $phoneRecord])->withErrors($validator);
             }
 
             $phoneRecord->update($request->all());
-            $phoneRecord->save();
         }
         return redirect()->route('phoneRecords.index');
     }
