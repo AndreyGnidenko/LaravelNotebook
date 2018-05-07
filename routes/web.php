@@ -12,4 +12,4 @@
 */
 
 Route::resource('phoneRecords', 'PhoneBookController');
-Route::redirect('', 'phoneRecords');
+Route::redirect('/', 'phoneRecords');
